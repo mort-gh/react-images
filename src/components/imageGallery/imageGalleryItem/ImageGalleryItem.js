@@ -1,10 +1,15 @@
 import React from "react";
 import css from "./ImageGalleryItem.module.css";
 
-const ImageGalleryItem = ({ id, webformatURL, largeImageURL }) => {
+const ImageGalleryItem = ({ webformatURL, id, openModal }) => {
   return (
-    <li className={css.ImageGalleryItem}>
-      <img src={webformatURL} alt="" className={css.ImageGalleryItemImage} />
+    <li className={css.ImageGalleryItem} onClick={openModal}>
+      <img
+        src={webformatURL}
+        alt=""
+        id={id}
+        className={css.ImageGalleryItemImage}
+      />
     </li>
   );
 };

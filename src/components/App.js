@@ -4,19 +4,29 @@ import Searchbar from "./searchBar/Searchbar";
 import ImageGallery from "./imageGallery/ImageGallery";
 import Button from "./button/Button";
 import Loader from "./loader/Loader";
+import Modal from "./modal/Modal";
 
 class App extends Component {
   state = {
     gallery: [],
     query: "",
     loading: true,
-    page: 1
+    page: 1,
+    modal: false,
+    largeImg: ""
   };
 
-  async componentDidMount() {
+  componentDidMount() {
+    this.getFetch();
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    prevState.query !== this.state.query && this.getFetch();
+  }
+
+  getFetch = async () => {
     try {
       const data = await fetchImages(this.state.query, this.state.page);
-
       this.setState({
         gallery: data,
         loading: false
@@ -24,25 +34,7 @@ class App extends Component {
     } catch (e) {
       console.log(e);
     }
-  }
-
-  async componentDidUpdate(prevProps, prevState) {
-    if (prevState.query !== this.state.query) {
-      console.log("componentDidUpdate");
-      try {
-        const data = await fetchImages(this.state.query, this.state.page);
-        this.setState({
-          gallery: data,
-          loading: false
-        });
-
-        console.log("data", data);
-      } catch (e) {
-        console.log(e);
-      }
-    } else {
-    }
-  }
+  };
 
   handleSubmit = e => {
     e.preventDefault();
@@ -56,28 +48,62 @@ class App extends Component {
 
   loadMoreImages = async () => {
     this.setState(prev => ({
+      loading: true,
       page: prev.page + 1
     }));
     const nextPage = this.state.page + 1;
 
     try {
       const data = await fetchImages(this.state.query, nextPage);
-      this.setState({
-        gallery: data
+
+      this.setState(prev => ({
+        gallery: [...prev.gallery, ...data],
+        loading: false
+      }));
+
+      window.scrollTo({
+        top: document.documentElement.scrollHeight,
+        behavior: "smooth"
       });
     } catch (e) {
       console.log(e);
     }
   };
 
+  openModal = event => {
+    this.state.gallery.forEach(elem => {
+      if (elem.id === Number(event.target.id)) {
+        this.setState({
+          modal: true,
+          largeImg: elem.largeImageURL
+        });
+      }
+    });
+
+    window.onkeydown = this.closeModal;
+  };
+
+  closeModal = event => {
+    if (event.code === "Escape" || event.target.id === "overlay") {
+      this.setState({
+        modal: false
+      });
+    }
+  };
+
   render() {
-    const { gallery, loading } = this.state;
+    const { gallery, loading, modal, largeImg } = this.state;
     return (
       <>
         {loading && <Loader />}
+        {modal ? <Modal img={largeImg} closeModal={this.closeModal} /> : null}
         <Searchbar onHandleSubmit={this.handleSubmit} />
-        <ImageGallery data={gallery} />
-        <Button onClickLoadMore={this.loadMoreImages} />
+        <ImageGallery data={gallery} openModal={this.openModal} />
+        {gallery.length >= 12 ? (
+          <Button onClickLoadMore={this.loadMoreImages} />
+        ) : (
+          <></>
+        )}
       </>
     );
   }
