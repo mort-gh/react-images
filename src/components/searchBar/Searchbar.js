@@ -22,3 +22,9 @@ const Searchbar = ({ onHandleSubmit }) => {
 };
 
 export default Searchbar;
+
+// {gallery.length >= 12 ? (
+//   <Button onClickLoadMore={this.loadMoreImages} />
+// ) : (
+//   <div></div>
+// )}

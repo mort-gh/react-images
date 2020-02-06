@@ -28,31 +28,29 @@ class App extends Component {
 
   async componentDidUpdate(prevProps, prevState) {
     if (prevState.query !== this.state.query) {
-      this.setState({
-        loading: true
-      });
-
+      console.log("componentDidUpdate");
       try {
         const data = await fetchImages(this.state.query, this.state.page);
         this.setState({
           gallery: data,
-          query: "",
-          loading: false,
-          page: 1
+          loading: false
         });
+
+        console.log("data", data);
       } catch (e) {
         console.log(e);
       }
+    } else {
     }
   }
 
-  handleSubmit = async e => {
+  handleSubmit = e => {
     e.preventDefault();
-    console.log("e value", e.target.elements[1].value);
 
     this.setState({
       gallery: [],
-      query: e.target.elements[1].value
+      query: e.target.elements[1].value,
+      loading: true
     });
   };
 
