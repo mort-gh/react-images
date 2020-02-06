@@ -7,7 +7,7 @@ export const fetchImages = async (query, page) => {
     );
     return data.data.hits;
   } catch (error) {
-    console.error(error);
+    console.error("FETCH ERROR: ", error);
     throw new Error(error);
   }
 };

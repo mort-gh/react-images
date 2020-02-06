@@ -8,28 +8,53 @@ import Loader from "./loader/Loader";
 class App extends Component {
   state = {
     gallery: [],
+    query: "",
     loading: true,
     page: 1
   };
 
   async componentDidMount() {
     try {
-      const data = await fetchImages("car", 1);
+      const data = await fetchImages(this.state.query, this.state.page);
 
       this.setState({
         gallery: data,
         loading: false
       });
-
-      console.log("data", data);
     } catch (e) {
       console.log(e);
     }
   }
 
   async componentDidUpdate(prevProps, prevState) {
-    console.log("prevProps, prevState", prevProps, prevState);
+    if (prevState.query !== this.state.query) {
+      this.setState({
+        loading: true
+      });
+
+      try {
+        const data = await fetchImages(this.state.query, this.state.page);
+        this.setState({
+          gallery: data,
+          query: "",
+          loading: false,
+          page: 1
+        });
+      } catch (e) {
+        console.log(e);
+      }
+    }
   }
+
+  handleSubmit = async e => {
+    e.preventDefault();
+    console.log("e value", e.target.elements[1].value);
+
+    this.setState({
+      gallery: [],
+      query: e.target.elements[1].value
+    });
+  };
 
   loadMoreImages = async () => {
     this.setState(prev => ({
@@ -38,7 +63,7 @@ class App extends Component {
     const nextPage = this.state.page + 1;
 
     try {
-      const data = await fetchImages("car", nextPage);
+      const data = await fetchImages(this.state.query, nextPage);
       this.setState({
         gallery: data
       });
@@ -52,7 +77,7 @@ class App extends Component {
     return (
       <>
         {loading && <Loader />}
-        <Searchbar />
+        <Searchbar onHandleSubmit={this.handleSubmit} />
         <ImageGallery data={gallery} />
         <Button onClickLoadMore={this.loadMoreImages} />
       </>

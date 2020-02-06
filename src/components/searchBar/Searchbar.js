@@ -1,10 +1,10 @@
 import React from "react";
 import css from "./Searchbar.module.css";
 
-const Searchbar = () => {
+const Searchbar = ({ onHandleSubmit }) => {
   return (
     <header className={css.Searchbar}>
-      <form className={css.SearchForm}>
+      <form onSubmit={onHandleSubmit} className={css.SearchForm}>
         <button type="submit" className={css.SearchFormButton}>
           <span className={css.SearchFormButtonLabel}></span>
         </button>
